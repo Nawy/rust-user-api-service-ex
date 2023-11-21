@@ -1,23 +1,43 @@
 use crate::models::users::ActiveModel as UserActiveModel;
 use crate::models::users::Entity as User;
 use crate::models::users::Model as UserModel;
-use crate::models::users::Model;
 use axum::{extract::State, http::StatusCode, Json};
 use sea_orm::{ActiveModelTrait, DatabaseConnection, EntityTrait, Set};
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
 pub struct UserDto {
+    pub id: i32,
     pub email: String,
     pub name: String,
+    pub fact: String,
 }
-impl From<Model> for UserDto {
-    fn from(value: Model) -> Self {
+impl From<UserModel> for UserDto {
+    fn from(value: UserModel) -> Self {
         Self {
+            id: value.id,
             email: value.email,
             name: value.name,
+            fact: value.fact,
         }
     }
+}
+
+impl From<UserActiveModel> for UserDto {
+    fn from(value: UserActiveModel) -> Self {
+        Self {
+            id: value.id.unwrap(),
+            email: value.email.unwrap(),
+            name: value.name.unwrap(),
+            fact: value.fact.unwrap(),
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct CreateUserDto {
+    pub email: String,
+    pub name: String,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -36,7 +56,7 @@ pub async fn get_all(
 
 pub async fn create_user(
     State(db): State<DatabaseConnection>,
-    Json(new_user): Json<UserDto>,
+    Json(new_user): Json<CreateUserDto>,
 ) -> Result<Json<UserDto>, StatusCode> {
     let resp = reqwest::get("https://catfact.ninja/fact")
         .await
@@ -44,17 +64,17 @@ pub async fn create_user(
         .json::<CatFactDto>()
         .await
         .unwrap();
-    println!("Fact {}", resp.fact);
 
-    UserActiveModel {
+    let create_user = UserActiveModel {
         email: Set(new_user.email.to_string()),
         name: Set(new_user.name.to_string()),
+        fact: Set(resp.fact.to_string()),
         ..Default::default()
     }
     .save(&db)
     .await
     .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
-    Ok(Json(new_user))
+    Ok(Json(create_user.into()))
 }
 
 pub async fn delete_user() -> Result<Json<UserDto>, StatusCode> {

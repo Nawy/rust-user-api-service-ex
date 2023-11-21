@@ -5,7 +5,7 @@ use axum::{
 use sea_orm::{Database, DatabaseConnection};
 use std::{error::Error, net::SocketAddr};
 
-mod handlers;
+mod api;
 mod models;
 
 #[tokio::main]
@@ -16,7 +16,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let app = Router::new()
         .route(
             "/user",
-            get(handlers::users::get_all).post(handlers::users::create_user),
+            get(api::users::get_all).post(api::users::create_user),
         )
         .with_state(db);
 
