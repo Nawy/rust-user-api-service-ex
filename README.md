@@ -1,29 +1,28 @@
-# User CRUD REST API Service
-### Create a new user
+# Posts CRUD REST API Service
+### Create a new post
 
 ```sh
-POST /user
+POST /post
 
 ```
 Body:
 ```json
 {
-    "email": "john@mail.com",
-    "name": "John Doe"
+    "title": "Some title"
 }
 ```
 ### Delete a user
 ```sh
-DELETE /user/{user-id}
+DELETE /post/{user-id}
 ```
 
 ### Get one user
 ```sh
-GET /user/{user-id}
+GET /post/{user-id}
 ```
 
 ### List all users
 
 ```sh
-GET /user
+GET /post
 ```

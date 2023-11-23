@@ -1,7 +1,4 @@
-use axum::{
-    routing::{get, post},
-    Json, Router,
-};
+use axum::{routing::get, Router};
 use sea_orm::{Database, DatabaseConnection};
 use std::{error::Error, net::SocketAddr};
 
@@ -15,8 +12,12 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     let app = Router::new()
         .route(
-            "/user",
-            get(api::users::get_all).post(api::users::create_user),
+            "/api/post",
+            get(api::posts::get_all).post(api::posts::create_post),
+        )
+        .route(
+            "/api/post/:id",
+            get(api::posts::get_post).delete(api::posts::delete_post),
         )
         .with_state(db);
 

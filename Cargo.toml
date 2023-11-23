@@ -1,5 +1,5 @@
 [package]
-name = "vrs_client_cms"
+name = "posts-service-api-ex"
 version = "0.1.0"
 edition = "2021"
 
